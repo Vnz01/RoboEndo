@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="maxon_epos_driver" type="maxon_bringup" name="maxon_bringup" output="screen">
+    <rosparam file="$(find maxon_epos_example)/config/motor_hd.yaml" command="load" />
+  </node>
+
+</launch>

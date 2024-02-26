@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="maxon_epos_driver" type="maxon_bringup" name="maxon_bringup" output="screen">
+    <rosparam file="$(find maxon_epos_example)/scripts/control_test.py" command="load" />
+  </node>
+
+</launch>
