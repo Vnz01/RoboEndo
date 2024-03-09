@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 
+import serial
 import rospy
 from pySerialTransfer import pySerialTransfer as txfer
 import numpy as np
 import sys, tty, termios, signal, select
 from maxon_epos_msgs.msg import MotorState, MotorStates
-from cc_model.msg import CableActuation
+# from cc_model.msg import CableActuation
 import copy
 from pynput import mouse
 
-
+ser = serial.Serial("/dev/ttyACM1", 9600)
 
 ######################################## SETTINGS DEFINITIONS ############################################################################
 
@@ -24,7 +25,8 @@ CABLE_DISPLACEMENT_RELEASING_SLOPE = 1       # rate at which input sigal convert
 TENSION_DIR = [-1,1,-1,1]                    # this converts the spooling directions so that +ve on setAllTargetPositions is tension, -ve is release
 JOYSTICK_AVAILABLE = 0                       # SET THIS TO 1 if you are using Joystick, otherwise 0
 KEYBOARD_AVAILABLE = 0                       # SET THIS TO 1 if you are using Keyboard, otherwise 0
-MOUSE_AVAILABLE = 1                          # SET THIS TO 1 if you are using Mouse, otherwise 0
+MOUSE_AVAILABLE = 0  
+NEW_AVAILABLE = 1                         # SET THIS TO 1 if you are using Mouse, otherwise 0
 JOYSTICK_SERIALPORT = '/dev/ttyACM0'         # Serial port for joystick 
 JOYSTICK_ZERO_XY_OFFSET = [0.06,0.07]        # makes reading from joystick as close as possible to 0 when the joystick is not touched
 
@@ -329,6 +331,15 @@ if __name__ == "__main__":
                 x = mouse_object.normalized_x
                 y = mouse_object.normalized_y
                 offset_theta = mouse_object.offset_angle
+            elif NEW_AVAILABLE:
+                # if(x != 0):
+                #     x = 0
+                #     y = 0
+                # else:
+                #     x = 1
+                #     y = 1
+                value = ser.readline().decode("utf-8")
+                print(value)
 
             else:
                 #error
