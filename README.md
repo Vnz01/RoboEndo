@@ -39,3 +39,14 @@ A1 - Analog Stick Y
 ## Computer Side
 
 Using Linux Ubuntu 20.04, install ROS2 Noetic. Download catkin. Following the readme inside /Catheter-Control-main/src/README.md, install the official EPOS Linux Driver. Check the EPOS Command Library PDF. I found the drivers on the japanese maxon motor website after looking at their products. EPOS Studio is for downloading drivers straight to the motors. Then you will be using catkin build not catkin_make to access all the directories. So following the other README located in /Catheter-Control-main/README.md scroll to the bottom. Copy the src file in /Catheter-Control-main to the src file created by catkin build and run your catkin build. To edit the code, look inside the Catheter-Control-main and find control_test.py and edit the if else conditional where NEW CONTROLLER is located.
+
+## ROS Commands
+
+Source the files -
+source ~/catkin_ws/devel/setup.bash
+
+Start ROS -
+roslaunch maxon_epos_example example_maxon_epos.launch
+
+Run ROSPY -
+rosrun maxon_epos_example control_test.py

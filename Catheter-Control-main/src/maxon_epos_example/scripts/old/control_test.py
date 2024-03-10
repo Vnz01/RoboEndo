@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import serial
+import re
 import rospy
 from pySerialTransfer import pySerialTransfer as txfer
 import numpy as np
@@ -38,6 +39,8 @@ keyboardControl = {
     'd': [0, -0.05]
 }
 
+# String format
+pattern = r'L(\d)F(\d)B(\d)X(\d)P(\d+),(\d+)'
 
 ##################################### CLASS DEFINITIONS ############################################################################
 
@@ -332,14 +335,24 @@ if __name__ == "__main__":
                 y = mouse_object.normalized_y
                 offset_theta = mouse_object.offset_angle
             elif NEW_AVAILABLE:
-                # if(x != 0):
-                #     x = 0
-                #     y = 0
-                # else:
-                #     x = 1
-                #     y = 1
                 value = ser.readline().decode("utf-8")
+                match = re.match(pattern, input_string)
                 print(value)
+                if match:
+                    L_state = int(match.group(1))
+                    F_state = int(match.group(2))
+                    B_state = int(match.group(3))
+                    X_state = int(match.group(4))
+                    P_X_position = int(match.group(5))
+                    P_Y_position = int(match.group(6))
+                else:
+                    print("Pattern not found in the input string.")
+                print("L state:", L_state)
+                print("F state:", F_state)
+                print("B state:", B_state)
+                print("X state:", X_state)
+                print("P_X_position:", P_X_position)
+                print("P_Y_position:", P_Y_position)
 
             else:
                 #error
