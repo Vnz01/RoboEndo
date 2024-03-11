@@ -118,7 +118,9 @@ class CatheterStateMachine(StateMachine):
             print('        Press the [Start] button on the controller to continue')
             CCTRL.pause_for_user(0)
         elif NEWCONTROLLER_AVAILABLE == 1:
-            print('        ECE 191 Controller Enabled')
+            print('        New Controller Enabled')
+            print('        Press the joystick button on the controller to continue')
+            CCTRL.pause_for_user(0)
 
 
     def on_exit_Start_Up(self):
@@ -245,6 +247,15 @@ class CatheterController():
             if XBOX_AVAILABLE:
                 while(self.xbuts[7]==0):
                     rospy.sleep(0.002)
+            elif NEWCONTROLLER_AVAILABLE:
+                xState = 1
+                while(xState == 1):
+                    value = ser.readline().decode("utf-8")
+                    match = re.match(pattern, input_string)
+                    if match:
+                        xState = int(match.group(4))
+                    else:
+                        print("Pattern not found in the input string.")
             else:
                 while(getKey(None)!='w'):
                     rospy.sleep(0.002)

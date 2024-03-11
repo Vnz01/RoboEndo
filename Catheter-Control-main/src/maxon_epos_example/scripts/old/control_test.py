@@ -249,6 +249,7 @@ if __name__ == "__main__":
         offset_theta = 0 # this accounts for angle offsets between joystick and output of the catheter
         x = 0 #assume x,y of a unit circle
         y = 0 #assume x,y of a unit circle
+        prevLState = 1 # track lock button state
 
 
         # Start joystick control
@@ -260,7 +261,6 @@ if __name__ == "__main__":
         # Start mouse control
         if MOUSE_AVAILABLE == 1:
             mouse_object = MouseClass()
-
 
         while not rospy.is_shutdown():
             signal.signal(signal.SIGINT, quit)
@@ -335,24 +335,57 @@ if __name__ == "__main__":
                 y = mouse_object.normalized_y
                 offset_theta = mouse_object.offset_angle
             elif NEW_AVAILABLE:
+                # Read Serial Data
                 value = ser.readline().decode("utf-8")
                 match = re.match(pattern, input_string)
-                print(value)
+
+                # Parse Data
                 if match:
-                    L_state = int(match.group(1))
-                    F_state = int(match.group(2))
-                    B_state = int(match.group(3))
-                    X_state = int(match.group(4))
-                    P_X_position = int(match.group(5))
-                    P_Y_position = int(match.group(6))
+                    lState = int(match.group(1))
+                    fState = int(match.group(2))
+                    bState = int(match.group(3))
+                    xState = int(match.group(4))
+                    xPos = int(match.group(5))
+                    yPox = int(match.group(6))
                 else:
                     print("Pattern not found in the input string.")
-                print("L state:", L_state)
-                print("F state:", F_state)
-                print("B state:", B_state)
-                print("X state:", X_state)
-                print("P_X_position:", P_X_position)
-                print("P_Y_position:", P_Y_position)
+
+                # Offset Handling 498,498 is resting on joystick
+                x_offset = xPos - 500
+                y_offset = yPos - 500
+
+                # Map Rectangular Axis to a Unit Circle
+                joy_theta = np.arctan2(y_offset, x_offset)
+                joy_radius = np.sqrt(x_offset**2 + y_offset**2)
+
+                # Joystick Map is 0,0 to 1024,1024
+                scaling_coeff_1 = 0.4659
+                scaling_coeff_2 = 0.4549
+                scaling_coeff_3 = 0.4989
+
+                joy_scaling_factor = scaling_coeff_1 * np.abs(np.sin(joy_theta)) +
+                                     scaling_coeff_2 * np.abs(np.cos(joy_theta)) +
+                                     scaling_coeff_3
+
+                r_clamped = np.min([1,joy_radius/joy_scaling_factor]) 
+                x = r_clamped*np.cos(joy_theta)
+                y = r_clamped*np.sin(joy_theta)
+
+                if(prevLState == 1 and lState == 0):
+                    xHold = x
+                    yHold = y
+
+                prevLState = lState
+
+                if not lState:
+                    x = xHold
+                    y = yHold
+                elif not fState:
+                    # protract code
+                    pass
+                elif not bState:
+                    # retract code
+                    pass
 
             else:
                 #error
