@@ -359,15 +359,15 @@ if __name__ == "__main__":
                 joy_radius = np.sqrt(x_offset**2 + y_offset**2)
 
                 # Joystick Map is 0,0 to 1024,1024
-                scaling_coeff_1 = 0.4659
-                scaling_coeff_2 = 0.4549
-                scaling_coeff_3 = 0.4989
+                # scaling_coeff_1 = 0.4659
+                # scaling_coeff_2 = 0.4549
+                # scaling_coeff_3 = 0.4989
 
-                joy_scaling_factor = scaling_coeff_1 * np.abs(np.sin(joy_theta)) +
-                                     scaling_coeff_2 * np.abs(np.cos(joy_theta)) +
-                                     scaling_coeff_3
+                # joy_scaling_factor = scaling_coeff_1 * np.abs(np.sin(joy_theta)) +
+                #                      scaling_coeff_2 * np.abs(np.cos(joy_theta)) +
+                #                      scaling_coeff_3
 
-                r_clamped = np.min([1,joy_radius/joy_scaling_factor]) 
+                r_clamped = np.min([1,joy_radius/512**2]) 
                 x = r_clamped*np.cos(joy_theta)
                 y = r_clamped*np.sin(joy_theta)
 
