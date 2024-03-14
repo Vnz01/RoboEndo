@@ -17,8 +17,18 @@ const int backward = 11;
 const int extraBtn = 10;
 const int powerLED = 6;
 
+// Battery
+const int battery = A2;
+bool ledState = false; 
+
+// Battery Datasheet
+const float minVoltage = 2.75;
+const float maxVoltage = 4.2;
+
 // Latency
 const int latency = 10;
+const int interval = 500;
+unsigned long previousMillis = 0;
 
 // True state means unlocked, continue sending values
 // False state means locked, position is stuck
@@ -80,6 +90,25 @@ void setup() {
 }
 
 void loop() {
+
+  int sensorValue = analogRead(battery);
+  float voltage = sensorValue * (3.3 / 1023.0);
+
+  // Serial.println(voltage);
+  
+  float batteryPercent = map(voltage, minVoltage, maxVoltage, 0, 100);
+  batteryPercent = constrain(batteryPercent, 0, 100);
+  
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    if(batteryPercent < 10){
+      ledState = !ledState;
+      digitalWrite(powerLED, ledState);
+    }
+  }
+
   if(digitalRead(lockPos)){
     joyX = String(analogRead(joyXPin));
     joyY = String(analogRead(joyYPin));
