@@ -15,7 +15,8 @@ const int lockPos = 13;
 const int forward = 12;
 const int backward = 11;
 const int extraBtn = 10;
-const int powerLED = 6;
+const int powerLED = 9;
+const int chargeLED = 5;
 
 // Battery
 const int battery = A2;
@@ -87,6 +88,7 @@ void setup() {
   backState = digitalRead(backward);
   xtraState = digitalRead(extraBtn);
   digitalWrite(powerLED, HIGH);
+  digitalWrite(chargeLED, HIGH);
 }
 
 void loop() {
@@ -100,12 +102,13 @@ void loop() {
   batteryPercent = constrain(batteryPercent, 0, 100);
   
   unsigned long currentMillis = millis();
+
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
     if(batteryPercent < 10){
       ledState = !ledState;
-      digitalWrite(powerLED, ledState);
+      digitalWrite(chargeLED, ledState);
     }
   }
 
