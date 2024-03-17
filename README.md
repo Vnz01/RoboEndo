@@ -26,7 +26,9 @@ En - Gnd: Slide Switch (Power Enabling)
 
 10 - Gnd: Analog Stick Switch (Start Button)
 
-6 - Gnd: Power LED
+3.3V - Gnd: Power LED
+
+5 - Gnd: Charging LED
 
 3V3 - Analog Stick Power
 
