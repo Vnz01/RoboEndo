@@ -11,7 +11,7 @@ from maxon_epos_msgs.msg import MotorState, MotorStates
 import copy
 from pynput import mouse
 
-ser = serial.Serial("/dev/ttyACM1", 9600)
+ser = serial.Serial("/dev/ttyACM0", 9600)
 
 ######################################## SETTINGS DEFINITIONS ############################################################################
 
@@ -262,6 +262,8 @@ if __name__ == "__main__":
         if MOUSE_AVAILABLE == 1:
             mouse_object = MouseClass()
 
+        ser.flushInput()
+
         while not rospy.is_shutdown():
             signal.signal(signal.SIGINT, quit)
             signal.signal(signal.SIGTERM, quit)
@@ -337,8 +339,9 @@ if __name__ == "__main__":
             elif NEW_AVAILABLE:
                 # Read Serial Data
                 value = ser.readline().decode("utf-8")
-                match = re.match(pattern, input_string)
-
+                print(value)
+                match = re.match(pattern, value)
+                print(value)
                 # Parse Data
                 if match:
                     lState = int(match.group(1))
@@ -346,17 +349,20 @@ if __name__ == "__main__":
                     bState = int(match.group(3))
                     xState = int(match.group(4))
                     xPos = int(match.group(5))
-                    yPox = int(match.group(6))
+                    yPos = int(match.group(6))
                 else:
                     print("Pattern not found in the input string.")
 
+                
                 # Offset Handling 498,498 is resting on joystick
                 x_offset = xPos - 500
                 y_offset = yPos - 500
+                y = x_offset/512
+                x = y_offset/512
 
                 # Map Rectangular Axis to a Unit Circle
-                joy_theta = np.arctan2(y_offset, x_offset)
-                joy_radius = np.sqrt(x_offset**2 + y_offset**2)
+                # joy_theta = np.arctan2(y_offset, x_offset)
+                # joy_radius = np.sqrt(x_offset**2 + y_offset**2)
 
                 # Joystick Map is 0,0 to 1024,1024
                 # scaling_coeff_1 = 0.4659
@@ -367,9 +373,12 @@ if __name__ == "__main__":
                 #                      scaling_coeff_2 * np.abs(np.cos(joy_theta)) +
                 #                      scaling_coeff_3
 
-                r_clamped = np.min([1,joy_radius/512**2]) 
-                x = r_clamped*np.cos(joy_theta)
-                y = r_clamped*np.sin(joy_theta)
+                # r_clamped = np.min([1,joy_radius/512]) 
+                # x = r_clamped*np.cos(joy_theta)
+                # y = r_clamped*np.sin(joy_theta)
+
+                print("x is: ", x)
+                print("y is: ", y)
 
                 if(prevLState == 1 and lState == 0):
                     xHold = x
@@ -386,6 +395,8 @@ if __name__ == "__main__":
                 elif not bState:
                     # retract code
                     pass
+                y = y * -1
+                x = x * -1
 
             else:
                 #error
