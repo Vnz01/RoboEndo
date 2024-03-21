@@ -339,8 +339,9 @@ if __name__ == "__main__":
             elif NEW_AVAILABLE:
                 # Read Serial Data
                 value = ser.readline().decode("utf-8")
+                print(value)
                 match = re.match(pattern, value)
-
+                print(value)
                 # Parse Data
                 if match:
                     lState = int(match.group(1))
@@ -359,10 +360,25 @@ if __name__ == "__main__":
                 y = x_offset/512
                 x = y_offset/512
 
-                # Implement debugging func
-                # print(value)
-                # print("x is: ", x)
-                # print("y is: ", y)
+                # Map Rectangular Axis to a Unit Circle
+                # joy_theta = np.arctan2(y_offset, x_offset)
+                # joy_radius = np.sqrt(x_offset**2 + y_offset**2)
+
+                # Joystick Map is 0,0 to 1024,1024
+                # scaling_coeff_1 = 0.4659
+                # scaling_coeff_2 = 0.4549
+                # scaling_coeff_3 = 0.4989
+
+                # joy_scaling_factor = scaling_coeff_1 * np.abs(np.sin(joy_theta)) +
+                #                      scaling_coeff_2 * np.abs(np.cos(joy_theta)) +
+                #                      scaling_coeff_3
+
+                # r_clamped = np.min([1,joy_radius/512]) 
+                # x = r_clamped*np.cos(joy_theta)
+                # y = r_clamped*np.sin(joy_theta)
+
+                print("x is: ", x)
+                print("y is: ", y)
 
                 if(prevLState == 1 and lState == 0):
                     xHold = x
@@ -379,8 +395,6 @@ if __name__ == "__main__":
                 elif not bState:
                     # retract code
                     pass
-
-                # Orientation for our controller, might have to make changes for this depending on joystick orientation
                 y = y * -1
                 x = x * -1
 
