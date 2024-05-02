@@ -16,7 +16,7 @@ const int forward = 12;
 const int backward = 11;
 const int extraBtn = 10;
 const int powerLED = 9;
-const int chargeLED = 5;
+const int chargeLED = 6;
 
 // Battery
 const int battery = A2;
@@ -77,6 +77,7 @@ void setup() {
   pinMode(backward, INPUT_PULLUP);
   pinMode(extraBtn, INPUT_PULLUP);
   pinMode(powerLED, OUTPUT);
+  pinMode(chargeLED, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(lockPos), interruptLock, CHANGE);
   attachInterrupt(digitalPinToInterrupt(forward), interruptForward, CHANGE);
   attachInterrupt(digitalPinToInterrupt(backward), interruptBackward, CHANGE);
@@ -87,8 +88,8 @@ void setup() {
   forwState = digitalRead(forward);
   backState = digitalRead(backward);
   xtraState = digitalRead(extraBtn);
+  // digitalWrite(powerLED, HIGH);
   digitalWrite(powerLED, HIGH);
-  digitalWrite(chargeLED, HIGH);
 }
 
 void loop() {
