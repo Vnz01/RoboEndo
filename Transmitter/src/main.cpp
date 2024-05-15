@@ -18,6 +18,9 @@ const int extraBtn = 10;
 const int powerLED = 9;
 const int chargeLED = 6;
 
+// const int swPin1 = ;
+// const int swPin2 = ; 
+
 // Battery
 const int battery = A2;
 bool ledState = false; 
@@ -37,8 +40,11 @@ int lockState = 1;
 int forwState = 1;
 int backState = 1;
 int xtraState = 1;
+// int sw1 = 1;
+// int sw2 = 1;
 
 // String Initialize
+String encoded = "0"
 String joyX = "";
 String joyY = "";
 String XAndY = "500,500";
@@ -58,6 +64,12 @@ void interruptBackward() {
 void interruptXtra() {
     xtraState = digitalRead(extraBtn);
 }
+// void interruptSW1() {
+//     sw1 = digitalRead(swPin1);
+// }
+// void interruptSW2() {
+//     sw2 = digitalRead(swPin2);
+// }
 
 void setup() {
   Serial.begin(9600);
@@ -71,7 +83,16 @@ void setup() {
   }
   Serial.println("RFM95 Transmitter Initialized");
 
+  // set frequency for interference
+  rf95.setFrequency(915.0);
+
   // Setup Pins and Interrupts
+
+  // pinMode(swPin1, INPUT_PULLUP);
+  // pinMode(swPin2, INPUT_PULLUP);
+  // attachInterrupt(digitalPinToInterrupt(swPin1), interruptSW1, CHANGE);
+  // attachInterrupt(digitalPinToInterrupt(swPin2), interruptSW2, CHANGE);
+
   pinMode(lockPos, INPUT_PULLUP);
   pinMode(forward, INPUT_PULLUP);
   pinMode(backward, INPUT_PULLUP);
@@ -84,11 +105,15 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(extraBtn), interruptXtra, CHANGE);
 
   // Find current state of buttons
+
+  sw1 = digitalRead(swPin1);
+  sw2 = digitalRead(swPin2);
+
   lockState = digitalRead(lockPos);
   forwState = digitalRead(forward);
   backState = digitalRead(backward);
   xtraState = digitalRead(extraBtn);
-  // digitalWrite(powerLED, HIGH);
+
   digitalWrite(powerLED, HIGH);
 }
 
@@ -117,9 +142,21 @@ void loop() {
     joyX = String(analogRead(joyXPin));
     joyY = String(analogRead(joyYPin));
     XAndY = joyX + "," + joyY;
+
+    // Handler for rotational
+    // if(sw1){
+    //   encoded = "1";
+    // } else if (sw2){
+    //   encoded = "2";
+    // } else {
+    //   encoded = "0";
+    // }
+
   }
 
   totalData = "L" + String(lockState)+ "F" +String(forwState)+ "B" +String(backState)+ "X" + String(xtraState) + "P" + XAndY;
+
+  // totalData = "EN" + encoded + "L" + String(lockState)+ "F" +String(forwState)+ "B" +String(backState)+ "X" + String(xtraState) + "P" + XAndY;
 
   rf95.send((uint8_t*)totalData.c_str(), totalData.length());
   rf95.waitPacketSent();

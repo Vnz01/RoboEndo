@@ -11,17 +11,17 @@ void setup() {
   Serial.begin(9600);
   while (!Serial) ;
 
-  Serial.println("RFM95 Receiver Initializing...");
+  Serial.println("Radio Initializing");
 
   while(!rf95.init()) {
     rf95.init();
-    Serial.println("RFM95 initialization failed!");
+    Serial.println("Init Failed");
     delay(1000);
   }
 
-  // rf95.setFrequency(915.0);  // Adjust frequency as needed
+  rf95.setFrequency(915.0);  // Adjust frequency as needed
 
-  Serial.println("RFM95 Receiver Initialized");
+  Serial.println("Radio Online");
 }
 
 void loop() {
