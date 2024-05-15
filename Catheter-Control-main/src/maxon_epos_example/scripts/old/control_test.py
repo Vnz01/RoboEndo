@@ -220,7 +220,9 @@ class MouseClass():
         print('Angle Change = ', np.round(self.offset_angle/np.pi*180))
 #        print('Scrolled {0} at {1}'.format('down' if dy < 0 else 'up', (x, y)))
 
-
+def debug(input, flag = 0):
+    if flag: 
+        print(input)
 
 
 
@@ -250,6 +252,8 @@ if __name__ == "__main__":
         x = 0 #assume x,y of a unit circle
         y = 0 #assume x,y of a unit circle
         prevLState = 1 # track lock button state
+        retraction = 0
+        insertion = 0
 
 
         # Start joystick control
@@ -338,10 +342,12 @@ if __name__ == "__main__":
                 offset_theta = mouse_object.offset_angle
             elif NEW_AVAILABLE:
                 # Read Serial Data
+                debugFlag = 0
                 value = ser.readline().decode("utf-8")
-                print(value)
                 match = re.match(pattern, value)
-                print(value)
+
+                debug(value, debugFlag)
+                debug(match, debugFlag)
                 # Parse Data
                 if match:
                     lState = int(match.group(1))
@@ -351,14 +357,23 @@ if __name__ == "__main__":
                     xPos = int(match.group(5))
                     yPos = int(match.group(6))
                 else:
-                    print("Pattern not found in the input string.")
+                    debug("Match failed", debugFlag)
 
-                
+                #Implement calibration, battery voltage affects input
+
                 # Offset Handling 498,498 is resting on joystick
                 x_offset = xPos - 500
                 y_offset = yPos - 500
                 y = x_offset/512
                 x = y_offset/512
+
+                # XBOX CODE
+                joy_theta = np.arctan2(y,x)
+                joy_radius = np.sqrt(x**2 + y**2)
+                joy_scaling_factor = 0.4659*np.abs(np.sin(joy_theta))+0.4549*np.abs(np.cos(joy_theta))+0.4989
+                r_clamped = np.min([1,joy_radius/joy_scaling_factor]) 
+                x = r_clamped*np.cos(joy_theta)
+                y = r_clamped*np.sin(joy_theta)
 
                 # Map Rectangular Axis to a Unit Circle
                 # joy_theta = np.arctan2(y_offset, x_offset)
@@ -377,8 +392,8 @@ if __name__ == "__main__":
                 # x = r_clamped*np.cos(joy_theta)
                 # y = r_clamped*np.sin(joy_theta)
 
-                print("x is: ", x)
-                print("y is: ", y)
+                debug("x is: " + x, debugFlag)
+                debug("y is: " + y, debugFlag)
 
                 if(prevLState == 1 and lState == 0):
                     xHold = x
@@ -389,12 +404,15 @@ if __name__ == "__main__":
                 if not lState:
                     x = xHold
                     y = yHold
-                elif not fState:
+
+                if not fState:
                     # protract code
-                    pass
+                    insertion = 0
                 elif not bState:
                     # retract code
-                    pass
+                    retraction = 0
+
+                # Fix Orientation of our joystick
                 y = y * -1
                 x = x * -1
 
