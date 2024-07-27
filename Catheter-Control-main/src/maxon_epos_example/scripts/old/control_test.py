@@ -79,12 +79,14 @@ class CatheterController():
         self.desired_motor_state.states[1].motor_name = "motor_2"
         self.desired_motor_state.states[2].motor_name = "motor_3"
         self.desired_motor_state.states[3].motor_name = "motor_4"
+        self.desired_motor_state.states[4].motor_name = "motor_5"
 
-    def setAllTargetPositions(self, target_position):
+    def setAllTargetPositions(self, target_position, rotate_position):
         self.desired_motor_state.states[0].position = TENSION_DIR[0] * (target_position[0]+self.spool_zero_offset[0]) * 2 * np.pi 
         self.desired_motor_state.states[1].position = TENSION_DIR[1] * (target_position[1]+self.spool_zero_offset[1]) * 2 * np.pi 
         self.desired_motor_state.states[2].position = TENSION_DIR[2] * (target_position[2]+self.spool_zero_offset[2]) * 2 * np.pi 
         self.desired_motor_state.states[3].position = TENSION_DIR[3] * (target_position[3]+self.spool_zero_offset[3]) * 2 * np.pi 
+        self.desired_motor_state.states[4].position = rotate_position
 
     def zeroingSequence(self):
         print("REMOVE THE CATHETER before hitting 'w' key...")
@@ -434,7 +436,7 @@ if __name__ == "__main__":
             target_position = CCTRL.inverse_kinematics_constant_curvature(x_rotated,y_rotated)
 
             # Command motors to target position
-            CCTRL.setAllTargetPositions(target_position)
+            CCTRL.setAllTargetPositions(target_position, 0)
             CCTRL.desired_motor_state_pub.publish(CCTRL.desired_motor_state)
 
             #print('published position:', target_position) # tendon displacement

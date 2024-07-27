@@ -26,7 +26,7 @@ En - Gnd: Slide Switch (Power Enabling)
 
 10 - Gnd: Analog Stick Switch (Start Button)
 
-5 - Gnd: Power LED
+9 - Gnd: Power LED
 
 6 - Gnd: Charging LED
 
@@ -52,3 +52,15 @@ roslaunch maxon_epos_example example_maxon_epos.launch
 
 Run ROSPY -
 rosrun maxon_epos_example control_test.py
+
+## Left Off
+
+Controller working properly, there is commented code for a scroll wheel. Pins can be defined to any open pin. It adds to the existing string sent over serial. All the code just needs to be uncommented once scroll wheel is attached.
+
+For the catheter side, look in Catheter-Control-main/src/maxon-epos-example/scripts/old/control_test.py
+
+This file is the edited file and the one we use to control the catheter as we don't have libraries for the main control.py. In this file this is where it is defined for all the movements. To use the controller on your own file it is very modular, just make sure to read input from serial which is a constant string of data that just needs to be parsed.
+
+I left off at implementing the new motor 5 for retracting and protracting. I included a 5th motor in the configuration file in motor_hd.yaml. To implement this, looking inside maxon_epos_driver it seems that it checks how many motors are included and sends commands. You need to define in maxon_epos_example how these commands are sent over ROS and how it will control the 5th motor.
+
+Essentially to get a grasp of this I would restart on a new control_test.py and just read serial values sent by the controller, and try to redefine each movement instead of following the work I have.
